@@ -2,7 +2,7 @@ include "./vendor/premake/premake_customization/solution_items.lua"
 
 workspace "Hazel"
 	architecture "x86_64"
-	startproject "Hazelnut"
+	startproject "Çandbox"
 
 	configurations
 	{
@@ -41,4 +41,5 @@ group ""
 
 include "Hazel"
 include "Sandbox"
+include "Csandbox"
 include "Hazelnut"

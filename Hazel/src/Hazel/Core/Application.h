@@ -1,5 +1,6 @@
 #pragma once
 
+#include "CHazel.h"
 #include "Hazel/Core/Base.h"
 
 #include "Hazel/Core/Window.h"
@@ -46,6 +47,8 @@ namespace Hazel {
 		float m_LastFrameTime = 0.0f;
 	private:
 		static Application* s_Instance;
+		friend void ::hzCreateApplication(HZ_APP app);
+		friend void ::hzRunApplication(HZ_APP app);
 		friend int ::main(int argc, char** argv);
 	};
 

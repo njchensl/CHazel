@@ -3,6 +3,8 @@
 
 #include "EditorLayer.h"
 
+extern "C" int g_UseCAPI = 0;
+
 namespace Hazel {
 
 	class Hazelnut : public Application

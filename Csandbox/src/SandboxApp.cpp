@@ -4,8 +4,6 @@
 #include "Sandbox2D.h"
 #include "ExampleLayer.h"
 
-int g_UseCAPI = 0;
-
 class Sandbox : public Hazel::Application
 {
 public:

@@ -2,6 +2,7 @@
 
 // For use by Hazel applications
 
+
 #include "Hazel/Core/Base.h"
 
 #include "Hazel/Core/Application.h"
