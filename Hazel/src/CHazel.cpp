@@ -28,20 +28,6 @@ namespace Hazel
 	}
 
 	template <typename T>
-	T* CreateEmpty()
-	{
-		if (g_IsDefaultAllocationFunction)
-		{
-			T* ptr = static_cast<T*>(operator new(sizeof(T)));
-			memset(static_cast<void*>(ptr), 0, sizeof(T));
-			return ptr;
-		}
-		T* ptr = static_cast<T*>(g_AllocationFunction(sizeof(T)));
-		memset(static_cast<void*>(ptr), 0, sizeof(T));
-		return ptr;
-	}
-
-	template <typename T>
 	void DestroyPrimitive(T* ptr)
 	{
 		if (g_IsDefaultDeallocationFunction)
@@ -206,9 +192,18 @@ namespace Hazel
 		void (*Ctor)(HZ_APP) = EmptyFn;
 		void (*Dtor)(HZ_APP) = EmptyFn;
 
-		static CApplication* CreateCApplication()
+		static CApplication* InternalGenCApplication()
 		{
-			return CreateEmpty<CApplication>();
+			auto* ptr = static_cast<CApplication*>(malloc(sizeof(CApplication)));
+			HZ_CORE_ASSERT(ptr != nullptr, "Cannot allocate mem for application!");
+			memset(static_cast<void*>(ptr), 0, sizeof(CApplication));
+			return ptr;
+		}
+
+		static void InternalDestroyApplication(CApplication* ptr)
+		{
+			ptr->~CApplication();
+			free(ptr);
 		}
 	};
 }
@@ -301,7 +296,7 @@ HzStatus hzSetLayerOnUpdateFn(const HZint layer, void (* fn)(float))
 
 HZ_APP hzGenApplication()
 {
-	return CApplication::CreateCApplication();
+	return CApplication::InternalGenCApplication();
 }
 
 void hzSetApplicationCtor(HZ_APP app, void (*fn)(HZ_APP))
@@ -317,7 +312,12 @@ void hzSetApplicationDtor(HZ_APP app, void (*fn)(HZ_APP))
 void hzCreateApplication(HZ_APP app)
 {
 	auto* application = static_cast<CApplication*>(app);
+	auto* ctor = application->Ctor;
+	auto* dtor = application->Dtor;
 	new(application) CApplication;
+	application->Ctor = ctor;
+	application->Dtor = dtor;
+	ctor(application);
 	Application::s_Instance = application;
 }
 
@@ -328,7 +328,7 @@ void hzRunApplication(HZ_APP app)
 
 void hzDestroyApplication(HZ_APP app)
 {
-	Destroy(static_cast<CApplication*>(app));
+	CApplication::InternalDestroyApplication(static_cast<CApplication*>(app));
 }
 
 void hzAppPushLayer(HZ_APP app, HZint layer)

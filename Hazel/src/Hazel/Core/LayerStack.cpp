@@ -1,5 +1,6 @@
 #include "hzpch.h"
 #include "Hazel/Core/LayerStack.h"
+#include <CHazel.cpp>
 
 namespace Hazel {
 
@@ -8,7 +9,10 @@ namespace Hazel {
 		for (Layer* layer : m_Layers)
 		{
 			layer->OnDetach();
-			delete layer;
+			if (!dynamic_cast<CLayer*>(layer))
+			{
+				delete layer;
+			}
 		}
 	}
 
